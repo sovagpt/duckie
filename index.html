@@ -590,42 +590,106 @@
             event.target.innerHTML = '📸 CAPTURING...';
             event.target.disabled = true;
             
-            // Use html2canvas to capture the duck canvas
-            html2canvas(duckDisplay, {
-                width: 400,
-                height: 400,
-                scale: 3.75, // This will give us 1500x1500 output (400 * 3.75)
-                backgroundColor: null,
-                useCORS: true,
-                allowTaint: true,
-                foreignObjectRendering: true
-            }).then(canvas => {
-                // Create download link
-                const link = document.createElement('a');
-                link.download = 'my-duckie-pfp.png';
-                link.href = canvas.toDataURL('image/png');
+            // Wait a moment for any images to finish loading
+            setTimeout(() => {
+                // Use html2canvas to capture the duck canvas
+                html2canvas(duckDisplay, {
+                    width: 400,
+                    height: 400,
+                    scale: 3.75, // This will give us 1500x1500 output
+                    backgroundColor: '#ffffff', // White background instead of transparent
+                    useCORS: true,
+                    allowTaint: true,
+                    foreignObjectRendering: false, // Disable this to avoid CORS issues
+                    imageTimeout: 0,
+                    logging: true, // Enable logging to see what's happening
+                    onclone: function(clonedDoc) {
+                        // This function runs on the cloned document
+                        console.log('Document cloned for capture');
+                    }
+                }).then(canvas => {
+                    // Check if canvas is actually rendered
+                    const ctx = canvas.getContext('2d');
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    
+                    // Check if image is just black/empty
+                    let hasContent = false;
+                    for (let i = 0; i < data.length; i += 4) {
+                        if (data[i] !== 0 || data[i + 1] !== 0 || data[i + 2] !== 0) {
+                            hasContent = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!hasContent) {
+                        console.warn('Canvas appears to be empty/black');
+                        // Fallback: try a different approach
+                        captureWithDifferentMethod();
+                        return;
+                    }
+                    
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.download = 'my-duckie-pfp.png';
+                    link.href = canvas.toDataURL('image/png');
+                    
+                    // Trigger download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Reset button
+                    event.target.innerHTML = originalText;
+                    event.target.disabled = false;
+                    
+                    // Show success message
+                    alert('🎉 DUCKIE SAVED! 🎉\n\nYour custom duckie has been downloaded as a PNG image!');
+                    
+                }).catch(error => {
+                    console.error('Error capturing duck:', error);
+                    
+                    // Try fallback method
+                    captureWithDifferentMethod();
+                });
+            }, 500); // Wait 500ms for images to load
+            
+            function captureWithDifferentMethod() {
+                console.log('Trying alternative capture method...');
                 
-                // Trigger download
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                // Reset button
-                event.target.innerHTML = originalText;
-                event.target.disabled = false;
-                
-                // Show success message
-                alert('🎉 DUCKIE SAVED! 🎉\n\nYour custom duckie has been downloaded as a PNG image! Use it as your profile picture and show off your style! 🦆✨');
-                
-            }).catch(error => {
-                console.error('Error capturing duck:', error);
-                
-                // Reset button
-                event.target.innerHTML = originalText;
-                event.target.disabled = false;
-                
-                alert('😅 Oops! There was an issue saving your duckie. Make sure all images are loaded and try again!');
-            });
+                html2canvas(duckDisplay, {
+                    width: 400,
+                    height: 400,
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    useCORS: false,
+                    allowTaint: false,
+                    foreignObjectRendering: true,
+                    proxy: null
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'my-duckie-pfp.png';
+                    link.href = canvas.toDataURL('image/png');
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    event.target.innerHTML = originalText;
+                    event.target.disabled = false;
+                    
+                    alert('🎉 DUCKIE SAVED! 🎉\n\n(Alternative method used)');
+                    
+                }).catch(fallbackError => {
+                    console.error('Fallback method also failed:', fallbackError);
+                    
+                    // Reset button
+                    event.target.innerHTML = originalText;
+                    event.target.disabled = false;
+                    
+                    alert('😅 Image capture failed. This might be due to CORS restrictions with local images. Try hosting the images on a web server or GitHub Pages for proper functionality.');
+                });
+            }
         }
         
         // Create sparkles animation
