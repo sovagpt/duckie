@@ -373,6 +373,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         // Categories matching your Photoshop groups
         const categories = {
@@ -582,17 +583,49 @@
         }
         
         function saveDuck() {
-            // Convert duck to canvas and download
             const duckDisplay = document.getElementById('duckDisplay');
             
-            // Create a temporary canvas
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 400;
-            canvas.height = 400;
+            // Show loading message
+            const originalText = event.target.innerHTML;
+            event.target.innerHTML = '📸 CAPTURING...';
+            event.target.disabled = true;
             
-            // Simple approach - just alert for now since html2canvas isn't available
-            alert('🎉 DUCK SAVED! 🎉\n\n(In a real implementation, this would capture the duck design and save it as an image for your profile picture!)');
+            // Use html2canvas to capture the duck canvas
+            html2canvas(duckDisplay, {
+                width: 400,
+                height: 400,
+                scale: 3.75, // This will give us 1500x1500 output (400 * 3.75)
+                backgroundColor: null,
+                useCORS: true,
+                allowTaint: true,
+                foreignObjectRendering: true
+            }).then(canvas => {
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'my-duckie-pfp.png';
+                link.href = canvas.toDataURL('image/png');
+                
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Reset button
+                event.target.innerHTML = originalText;
+                event.target.disabled = false;
+                
+                // Show success message
+                alert('🎉 DUCKIE SAVED! 🎉\n\nYour custom duckie has been downloaded as a PNG image! Use it as your profile picture and show off your style! 🦆✨');
+                
+            }).catch(error => {
+                console.error('Error capturing duck:', error);
+                
+                // Reset button
+                event.target.innerHTML = originalText;
+                event.target.disabled = false;
+                
+                alert('😅 Oops! There was an issue saving your duckie. Make sure all images are loaded and try again!');
+            });
         }
         
         // Create sparkles animation
