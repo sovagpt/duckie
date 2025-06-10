@@ -130,6 +130,34 @@
             margin: 30px 0;
         }
         
+        .name-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #ff0080;
+            border-radius: 15px;
+            padding: 12px 20px;
+            font-family: 'Comic Neue', cursive;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ff0080;
+            text-align: center;
+            margin: 10px;
+            width: 300px;
+            transform: rotate(-0.5deg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .name-input:focus {
+            outline: none;
+            border-color: #00ff80;
+            transform: rotate(0deg) scale(1.05);
+            box-shadow: 0 0 20px #00ff80;
+        }
+        
+        .name-input::placeholder {
+            color: #ff0080;
+            opacity: 0.7;
+        }
+        
         .btn {
             background: linear-gradient(45deg, #ff0080, #ff8000);
             border: 3px solid #ffffff;
@@ -291,6 +319,85 @@
             transform: rotate(0.5deg);
         }
         
+        .hall-of-fame {
+            text-align: center;
+            margin: 40px 0;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px dashed #8000ff;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 
+                0 0 20px #8000ff,
+                inset 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .hall-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0 #ffffff;
+            transform: rotate(-1deg);
+            color: #8000ff;
+        }
+        
+        .loading-message {
+            font-size: 1.2em;
+            color: #ff0080;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .ducks-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+            justify-items: center;
+        }
+        
+        .duck-frame {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin-bottom: 15px;
+            transform: rotate(1deg);
+            transition: all 0.3s ease;
+        }
+        
+        .duck-frame:nth-child(even) {
+            transform: rotate(-1deg);
+        }
+        
+        .duck-frame:hover {
+            transform: rotate(0deg) scale(1.05);
+            z-index: 10;
+        }
+        
+        .frame-image {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .duck-name {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #ff0080, #8000ff);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-shadow: 1px 1px 0 #000000;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+        
         .sparkles {
             position: fixed;
             pointer-events: none;
@@ -338,8 +445,10 @@
         </div>
         
         <div class="controls">
+            <input type="text" id="duckerName" class="name-input" placeholder="Enter your name for the Hall of Fame!" maxlength="20">
             <button class="btn" onclick="clearDuck()">🗑️ CLEAR DUCK</button>
             <button class="btn" onclick="saveDuck()">💾 SAVE AS PFP</button>
+            <button class="btn" onclick="saveToHallOfFame()">🏆 ADD TO HALL OF FAME</button>
         </div>
         
         <div class="category-selector">
@@ -371,9 +480,115 @@
                 <span class="rainbow-text">✨ Together we fly higher! ✨</span>
             </p>
         </div>
+        
+        <div class="hall-of-fame">
+            <h3 class="hall-title rainbow-text">🏆 DUCKIES HALL OF FAME 🏆</h3>
+            <p style="font-size: 1.2em; color: #8000ff; font-weight: bold; margin-bottom: 20px;">
+                Check out these amazing custom duckies from our community! 
+            </p>
+            <div class="loading-message" id="hallLoading">🔄 Loading Hall of Fame...</div>
+            <div class="ducks-gallery" id="ducksGallery">
+                <!-- Duck frames will be populated here from Firebase -->
+            </div>
+        </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL, listAll } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js';
+        import { getFirestore, collection, addDoc, getDocs, orderBy, query, limit } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+        // Your Firebase config (replace with your actual config)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+        const db = getFirestore(app);
+
+        // Make functions available globally
+        window.saveToFirebase = async function(canvas, duckerName) {
+            try {
+                return new Promise((resolve) => {
+                    canvas.toBlob(async (blob) => {
+                        const timestamp = Date.now();
+                        const filename = `duck_${timestamp}.png`;
+                        
+                        const storageRef = ref(storage, `hall-of-fame/${filename}`);
+                        await uploadBytes(storageRef, blob);
+                        
+                        const downloadURL = await getDownloadURL(storageRef);
+                        
+                        await addDoc(collection(db, 'ducks'), {
+                            name: duckerName,
+                            imageUrl: downloadURL,
+                            timestamp: timestamp,
+                            createdAt: new Date()
+                        });
+                        
+                        resolve(downloadURL);
+                    }, 'image/png');
+                });
+            } catch (error) {
+                console.error('Error saving to Firebase:', error);
+                throw error;
+            }
+        };
+
+        window.loadHallOfFame = async function() {
+            try {
+                const q = query(collection(db, 'ducks'), orderBy('timestamp', 'desc'), limit(20));
+                const querySnapshot = await getDocs(q);
+                
+                const gallery = document.getElementById('ducksGallery');
+                const loading = document.getElementById('hallLoading');
+                
+                gallery.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    loading.innerHTML = '🦆 Be the first to add your duck to the Hall of Fame!';
+                    return;
+                }
+                
+                loading.style.display = 'none';
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const frameDiv = document.createElement('div');
+                    frameDiv.className = 'duck-frame';
+                    frameDiv.innerHTML = `
+                        <div class="frame-image" style="background-image: url('./images/frame.png'), url('${data.imageUrl}')">
+                        </div>
+                        <div class="duck-name">${data.name}</div>
+                    `;
+                    gallery.appendChild(frameDiv);
+                });
+                
+            } catch (error) {
+                console.error('Error loading Hall of Fame:', error);
+                document.getElementById('hallLoading').innerHTML = '❌ Error loading Hall of Fame';
+            }
+        };
+
+        // Load Hall of Fame when page loads
+        window.addEventListener('load', () => {
+            setTimeout(loadHallOfFame, 1000);
+        });
+    </script>
+
+    <!-- html2canvas for screenshots -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Main JavaScript -->
     <script>
         // Categories matching your Photoshop groups
         const categories = {
@@ -597,38 +812,13 @@
                     width: 400,
                     height: 400,
                     scale: 3.75, // This will give us 1500x1500 output
-                    backgroundColor: '#ffffff', // White background instead of transparent
+                    backgroundColor: '#ffffff', // White background
                     useCORS: true,
                     allowTaint: true,
-                    foreignObjectRendering: false, // Disable this to avoid CORS issues
+                    foreignObjectRendering: false,
                     imageTimeout: 0,
-                    logging: true, // Enable logging to see what's happening
-                    onclone: function(clonedDoc) {
-                        // This function runs on the cloned document
-                        console.log('Document cloned for capture');
-                    }
+                    logging: false
                 }).then(canvas => {
-                    // Check if canvas is actually rendered
-                    const ctx = canvas.getContext('2d');
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const data = imageData.data;
-                    
-                    // Check if image is just black/empty
-                    let hasContent = false;
-                    for (let i = 0; i < data.length; i += 4) {
-                        if (data[i] !== 0 || data[i + 1] !== 0 || data[i + 2] !== 0) {
-                            hasContent = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!hasContent) {
-                        console.warn('Canvas appears to be empty/black');
-                        // Fallback: try a different approach
-                        captureWithDifferentMethod();
-                        return;
-                    }
-                    
                     // Create download link
                     const link = document.createElement('a');
                     link.download = 'my-duckie-pfp.png';
@@ -649,47 +839,81 @@
                 }).catch(error => {
                     console.error('Error capturing duck:', error);
                     
-                    // Try fallback method
-                    captureWithDifferentMethod();
-                });
-            }, 500); // Wait 500ms for images to load
-            
-            function captureWithDifferentMethod() {
-                console.log('Trying alternative capture method...');
-                
-                html2canvas(duckDisplay, {
-                    width: 400,
-                    height: 400,
-                    scale: 2,
-                    backgroundColor: '#ffffff',
-                    useCORS: false,
-                    allowTaint: false,
-                    foreignObjectRendering: true,
-                    proxy: null
-                }).then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = 'my-duckie-pfp.png';
-                    link.href = canvas.toDataURL('image/png');
-                    
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
+                    // Reset button
                     event.target.innerHTML = originalText;
                     event.target.disabled = false;
                     
-                    alert('🎉 DUCKIE SAVED! 🎉\n\n(Alternative method used)');
+                    alert('😅 There was an issue saving your duckie. Please try again!');
+                });
+            }, 500);
+        }
+        
+        function saveToHallOfFame() {
+            const duckerName = document.getElementById('duckerName').value.trim();
+            
+            if (!duckerName) {
+                alert('🦆 Please enter your name first!');
+                document.getElementById('duckerName').focus();
+                return;
+            }
+            
+            const duckDisplay = document.getElementById('duckDisplay');
+            const accessories = document.getElementById('duckAccessories');
+            
+            if (!accessories.children.length) {
+                alert('🦆 Create your duck first before adding it to the Hall of Fame!');
+                return;
+            }
+            
+            // Show loading message
+            const originalText = event.target.innerHTML;
+            event.target.innerHTML = '🏆 ADDING TO FAME...';
+            event.target.disabled = true;
+            
+            // Capture with frame overlay
+            html2canvas(duckDisplay, {
+                width: 400,
+                height: 400,
+                scale: 3.75, // 1500x1500 output
+                backgroundColor: '#ffffff',
+                useCORS: true,
+                allowTaint: true,
+                foreignObjectRendering: false,
+                imageTimeout: 0
+            }).then(canvas => {
+                // Save to Firebase
+                window.saveToFirebase(canvas, duckerName).then(() => {
+                    // Reset button
+                    event.target.innerHTML = originalText;
+                    event.target.disabled = false;
                     
-                }).catch(fallbackError => {
-                    console.error('Fallback method also failed:', fallbackError);
+                    // Clear name input
+                    document.getElementById('duckerName').value = '';
+                    
+                    // Reload Hall of Fame
+                    window.loadHallOfFame();
+                    
+                    alert('🏆 CONGRATULATIONS! 🏆\n\nYour duck has been added to the Hall of Fame! Check it out below! 🦆✨');
+                    
+                }).catch(error => {
+                    console.error('Firebase error:', error);
                     
                     // Reset button
                     event.target.innerHTML = originalText;
                     event.target.disabled = false;
                     
-                    alert('😅 Image capture failed. This might be due to CORS restrictions with local images. Try hosting the images on a web server or GitHub Pages for proper functionality.');
+                    alert('😅 There was an issue adding your duck to the Hall of Fame. Please try again or check your internet connection!');
                 });
-            }
+                
+            }).catch(error => {
+                console.error('Capture error:', error);
+                
+                // Reset button
+                event.target.innerHTML = originalText;
+                event.target.disabled = false;
+                
+                alert('😅 Could not capture your duck. Please try again!');
+            });
         }
         
         // Create sparkles animation
