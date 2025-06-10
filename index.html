@@ -233,35 +233,6 @@
             object-fit: contain;
         }
         
-        .about-section {
-            text-align: center;
-            margin: 30px 0;
-            background: rgba(255, 255, 255, 0.9);
-            border: 3px dashed #00ff80;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 
-                0 0 20px #ff00ff,
-                inset 0 0 20px rgba(255, 255, 255, 0.5);
-        }
-        
-        .about-title {
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 0 #ffffff;
-            transform: rotate(-1deg);
-        }
-        
-        .about-text {
-            font-size: 1.3em;
-            color: #ff0080;
-            text-shadow: 1px 1px 0 #ffffff;
-            line-height: 1.4;
-            font-weight: bold;
-            transform: rotate(0.5deg);
-        }
-        
         .social-buttons {
             text-align: center;
             margin: 30px 0;
@@ -289,6 +260,35 @@
         .social-btn:hover {
             transform: rotate(3deg) scale(1.1);
             background: #00ff80;
+        }
+        
+        .about-section {
+            text-align: center;
+            margin: 30px 0;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px dashed #00ff80;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 0 20px #ff00ff,
+                inset 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .about-title {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0 #ffffff;
+            transform: rotate(-1deg);
+        }
+        
+        .about-text {
+            font-size: 1.3em;
+            color: #ff0080;
+            text-shadow: 1px 1px 0 #ffffff;
+            line-height: 1.4;
+            font-weight: bold;
+            transform: rotate(0.5deg);
         }
         
         .sparkles {
@@ -451,6 +451,10 @@
             backgrounds: null
         };
         
+        let currentCategory = 'mouth';
+        let selectedLayer = null;
+        let accessoryCount = 0;
+        
         function selectCategory(category) {
             currentCategory = category;
             
@@ -559,15 +563,6 @@
             layer.style.border = '2px solid #ff0080';
         }
         
-        function deleteSelected() {
-            if (selectedLayer) {
-                const category = selectedLayer.dataset.category;
-                selectedLayer.remove();
-                currentItems[category] = null;
-                selectedLayer = null;
-            }
-        }
-        
         function clearDuck() {
             document.getElementById('duckAccessories').innerHTML = '';
             // Reset all current items
@@ -577,6 +572,15 @@
             selectedLayer = null;
         }
         
+        function deleteSelected() {
+            if (selectedLayer) {
+                const category = selectedLayer.dataset.category;
+                selectedLayer.remove();
+                currentItems[category] = null;
+                selectedLayer = null;
+            }
+        }
+        
         function saveDuck() {
             // Convert duck to canvas and download
             const duckDisplay = document.getElementById('duckDisplay');
@@ -584,8 +588,8 @@
             // Create a temporary canvas
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = 300;
-            canvas.height = 300;
+            canvas.width = 400;
+            canvas.height = 400;
             
             // Simple approach - just alert for now since html2canvas isn't available
             alert('🎉 DUCK SAVED! 🎉\n\n(In a real implementation, this would capture the duck design and save it as an image for your profile picture!)');
@@ -614,6 +618,11 @@
         for (let i = 0; i < 20; i++) {
             setTimeout(createSparkle, i * 100);
         }
+        
+        // Initialize with mouth category
+        window.onload = function() {
+            selectCategory('mouth');
+        };
     </script>
 </body>
 </html>
