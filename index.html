@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+// Initialize with mouth category
+        window.onload = function() {
+            selectCategory('mouth');
+        };<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -65,52 +68,47 @@
         }
         
         .duck-container {
-            background: rgba(255, 255, 255, 0.9);
-            border: 5px dashed #ff0080;
+            background: transparent;
+            border: none;
             border-radius: 20px;
-            padding: 30px;
+            padding: 20px;
             margin: 20px 0;
             position: relative;
-            box-shadow: 
-                0 0 20px #ff00ff,
-                inset 0 0 20px rgba(255, 255, 255, 0.5);
         }
         
         .duck-display {
-            width: 1500px;
-            height: 1500px;
+            width: 400px;
+            height: 400px;
             margin: 0 auto;
             position: relative;
             background: transparent;
             border: 3px solid #ff0080;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
             border-radius: 20px;
-            transform: scale(0.27);
-            transform-origin: center;
+            overflow: hidden;
+            box-shadow: 
+                0 0 20px #ff00ff,
+                inset 0 0 10px rgba(255, 255, 255, 0.3);
         }
         
         .duck-base {
-            width: 1500px;
-            height: 1500px;
+            width: 400px;
+            height: 400px;
             background: transparent;
             position: absolute;
             top: 0;
             left: 0;
             background-image: url('./images/colours/colours-1.png');
-            background-size: 1500px 1500px;
+            background-size: 400px 400px;
             background-repeat: no-repeat;
-            background-position: top left;
+            background-position: center;
         }
         
         .duck-accessories {
             position: absolute;
             top: 0;
             left: 0;
-            width: 1500px;
-            height: 1500px;
+            width: 400px;
+            height: 400px;
         }
         
         .accessory {
@@ -120,8 +118,8 @@
         }
         
         .accessory img {
-            width: 1500px;
-            height: 1500px;
+            width: 400px;
+            height: 400px;
             object-fit: contain;
             display: block;
         }
