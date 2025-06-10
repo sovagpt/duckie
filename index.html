@@ -58,10 +58,31 @@
         .subtitle {
             text-align: center;
             font-size: 1.5em;
-            color: #ff0080;
-            text-shadow: 2px 2px 0 #ffffff;
-            margin-bottom: 30px;
+            color: #ffffff;
+            text-shadow: 
+                2px 2px 0 #ff0080,
+                4px 4px 0 #0080ff;
+            margin-bottom: 10px;
             transform: rotate(1deg);
+            font-weight: bold;
+        }
+        
+        .ca-notice {
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ffff00;
+            text-shadow: 
+                2px 2px 0 #ff0080,
+                4px 4px 0 #000000;
+            margin-bottom: 30px;
+            transform: rotate(-1deg);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: rotate(-1deg) scale(1); }
+            50% { transform: rotate(-1deg) scale(1.05); }
         }
         
         .duck-container {
@@ -436,6 +457,7 @@
     <div class="container">
         <h1 class="title">✨ THE DUCKIES MOVEMENT ✨</h1>
         <p class="subtitle rainbow-text">~* customize ur duck & make it EPIC *~</p>
+        <p class="ca-notice">CA: COMING SOON</p>
         
         <div class="duck-container">
             <div class="duck-display" id="duckDisplay">
