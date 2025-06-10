@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALFRED THE DUCK!!! ★彡</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff0080);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease infinite;
+            font-family: 'Comic Neue', cursive;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 
+                3px 3px 0 #ff0080,
+                6px 6px 0 #0080ff,
+                9px 9px 0 #80ff00;
+            transform: rotate(-2deg);
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: rotate(-2deg) translateY(0); }
+            40% { transform: rotate(-2deg) translateY(-10px); }
+            60% { transform: rotate(-2deg) translateY(-5px); }
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.5em;
+            color: #ff0080;
+            text-shadow: 2px 2px 0 #ffffff;
+            margin-bottom: 30px;
+            transform: rotate(1deg);
+        }
+        
+        .duck-container {
+            background: rgba(255, 255, 255, 0.9);
+            border: 5px dashed #ff0080;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: 
+                0 0 20px #ff00ff,
+                inset 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .duck-display {
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            position: relative;
+            background: transparent;
+            border: 3px solid #ff0080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+        
+        .duck-base {
+            width: 400px;
+            height: 400px;
+            background: transparent;
+            position: relative;
+            background-image: url('./images/duck-base.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .duck-accessories {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .accessory {
+            position: absolute;
+            font-size: 2em;
+            cursor: move;
+            user-select: none;
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff0080, #ff8000);
+            border: 3px solid #ffffff;
+            color: white;
+            font-family: 'Comic Neue', cursive;
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 12px 25px;
+            margin: 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            transform: rotate(-1deg);
+            transition: all 0.3s ease;
+            text-shadow: 2px 2px 0 #000000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:hover {
+            transform: rotate(1deg) scale(1.1);
+            background: linear-gradient(45deg, #ff8000, #ff0080);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn:active {
+            transform: rotate(-1deg) scale(0.95);
+        }
+        
+        .category-selector {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .category-btn {
+            background: linear-gradient(45deg, #ff0080, #ff8000);
+            border: 3px solid #ffffff;
+            color: white;
+            font-family: 'Comic Neue', cursive;
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transform: rotate(-1deg);
+            transition: all 0.3s ease;
+            text-shadow: 2px 2px 0 #000000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .category-btn:hover {
+            transform: rotate(1deg) scale(1.05);
+            background: linear-gradient(45deg, #ff8000, #ff0080);
+        }
+        
+        .category-btn.active {
+            background: linear-gradient(45deg, #00ff80, #0080ff);
+            transform: rotate(0deg) scale(1.1);
+        }
+        
+        .items-panel {
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px dotted #00ff80;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            min-height: 120px;
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+            justify-items: center;
+        }
+        
+        .item-slot {
+            width: 70px;
+            height: 70px;
+            background: #ffff00;
+            border: 2px solid #ff0080;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .item-slot:hover {
+            transform: scale(1.1) rotate(5deg);
+            background: #00ffff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .item-slot img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+        
+        .layer-controls {
+            text-align: center;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px dashed #ff0080;
+        }
+        
+        .layer-btn {
+            background: #8000ff;
+            border: 2px solid #ffffff;
+            color: white;
+            font-family: 'Comic Neue', cursive;
+            font-size: 1em;
+            font-weight: bold;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .layer-btn:hover {
+            background: #ff0080;
+            transform: scale(1.05);
+        }
+        
+        .social-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .social-btn {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            margin: 0 15px;
+            background: #ff0080;
+            border: 3px solid #ffffff;
+            border-radius: 15px;
+            font-size: 2em;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(-3deg);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .social-btn:hover {
+            transform: rotate(3deg) scale(1.1);
+            background: #00ff80;
+        }
+        
+        .sparkles {
+            position: fixed;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .sparkle {
+            position: absolute;
+            color: #ffffff;
+            font-size: 20px;
+            animation: sparkle 2s infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+        
+        .rainbow-text {
+            background: linear-gradient(45deg, #ff0080, #ff8000, #ffff00, #00ff80, #0080ff, #8000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: rainbow 3s linear infinite;
+        }
+        
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="sparkles" id="sparkles"></div>
+    
+    <div class="container">
+        <h1 class="title">✨ ALFRED THE DUCK ✨</h1>
+        <p class="subtitle rainbow-text">~* customize ur duck & make it EPIC *~</p>
+        
+        <div class="duck-container">
+            <div class="duck-display" id="duckDisplay">
+                <div class="duck-base"></div>
+                <div class="duck-accessories" id="duckAccessories"></div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="clearDuck()">🗑️ CLEAR DUCK</button>
+            <button class="btn" onclick="saveDuck()">💾 SAVE AS PFP</button>
+        </div>
+        
+        <div class="category-selector">
+            <button class="category-btn active" onclick="selectCategory('mouth')">👄 MOUTH</button>
+            <button class="category-btn" onclick="selectCategory('glasses')">👓 GLASSES</button>
+            <button class="category-btn" onclick="selectCategory('handheld')">✋ HANDHELD</button>
+            <button class="category-btn" onclick="selectCategory('hats')">🎩 HATS</button>
+            <button class="category-btn" onclick="selectCategory('accessories')">✨ ACCESSORIES</button>
+            <button class="category-btn" onclick="selectCategory('colours')">🎨 COLOURS</button>
+            <button class="category-btn" onclick="selectCategory('backgrounds')">🖼️ BACKGROUNDS</button>
+        </div>
+        
+        <div class="items-panel">
+            <div class="items-grid" id="itemsGrid">
+                <!-- Items will be populated here based on category -->
+            </div>
+        </div>
+        
+        <div class="layer-controls">
+            <p style="margin-bottom: 10px; font-weight: bold; color: #ff0080;">LAYER CONTROLS:</p>
+            <button class="layer-btn" onclick="moveLayerUp()">↑ MOVE UP</button>
+            <button class="layer-btn" onclick="moveLayerDown()">↓ MOVE DOWN</button>
+            <button class="layer-btn" onclick="deleteSelected()">🗑️ DELETE</button>
+        </div>
+        
+        <div class="social-buttons">
+            <a href="#" class="social-btn" title="Pump.fun"><img src="./images/social/pump-fun.png" style="width:40px;height:40px;object-fit:contain;"></a>
+            <a href="#" class="social-btn" title="X/Twitter"><img src="./images/social/twitter.png" style="width:40px;height:40px;object-fit:contain;"></a>
+        </div>
+    </div>
+
+    <script>
+        // Categories matching your Photoshop groups
+        const categories = {
+            mouth: [
+                './images/mouth/mouth-1.png',
+                './images/mouth/mouth-2.png',
+                './images/mouth/mouth-3.png',
+                './images/mouth/mouth-4.png',
+                './images/mouth/mouth-5.png'
+            ],
+            glasses: [
+                './images/glasses/glasses-1.png',
+                './images/glasses/glasses-2.png',
+                './images/glasses/glasses-3.png',
+                './images/glasses/glasses-4.png',
+                './images/glasses/glasses-5.png'
+            ],
+            handheld: [
+                './images/handheld/handheld-1.png',
+                './images/handheld/handheld-2.png',
+                './images/handheld/handheld-3.png',
+                './images/handheld/handheld-4.png',
+                './images/handheld/handheld-5.png'
+            ],
+            hats: [
+                './images/hats/hats-1.png',
+                './images/hats/hats-2.png',
+                './images/hats/hats-3.png',
+                './images/hats/hats-4.png',
+                './images/hats/hats-5.png'
+            ],
+            accessories: [
+                './images/accessories/accessories-1.png',
+                './images/accessories/accessories-2.png',
+                './images/accessories/accessories-3.png',
+                './images/accessories/accessories-4.png',
+                './images/accessories/accessories-5.png'
+            ],
+            colours: [
+                './images/colours/colours-1.png',
+                './images/colours/colours-2.png',
+                './images/colours/colours-3.png',
+                './images/colours/colours-4.png',
+                './images/colours/colours-5.png'
+            ],
+            backgrounds: [
+                './images/backgrounds/backgrounds-1.png',
+                './images/backgrounds/backgrounds-2.png',
+                './images/backgrounds/backgrounds-3.png',
+                './images/backgrounds/backgrounds-4.png',
+                './images/backgrounds/backgrounds-5.png'
+            ]
+        };
+        
+        let currentCategory = 'mouth';
+        let selectedLayer = null;
+        let layerOrder = 0;
+        
+        function selectCategory(category) {
+            currentCategory = category;
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update items grid
+            const grid = document.getElementById('itemsGrid');
+            grid.innerHTML = '';
+            
+            categories[category].forEach((item, index) => {
+                const slot = document.createElement('div');
+                slot.className = 'item-slot';
+                slot.onclick = () => addItem(item, category);
+                
+                const img = document.createElement('img');
+                img.src = item;
+                img.alt = `${category} ${index + 1}`;
+                
+                slot.appendChild(img);
+                grid.appendChild(slot);
+            });
+        }
+        
+        function addItem(imageSrc, category) {
+            const accessoriesContainer = document.getElementById('duckAccessories');
+            const accessory = document.createElement('div');
+            accessory.className = 'accessory';
+            accessory.dataset.category = category;
+            accessory.dataset.layer = layerOrder++;
+            
+            // Create image element
+            const img = document.createElement('img');
+            img.src = imageSrc;
+            img.style.width = '80px';
+            img.style.height = '80px';
+            img.style.objectFit = 'contain';
+            accessory.appendChild(img);
+            
+            accessory.id = `accessory-${accessoryCount++}`;
+            
+            // Position based on category (you can adjust these)
+            let defaultX = 160, defaultY = 160;
+            switch(category) {
+                case 'mouth': defaultY = 220; break;
+                case 'glasses': defaultY = 180; break;
+                case 'hats': defaultY = 100; break;
+                case 'handheld': defaultX = 280; defaultY = 200; break;
+                case 'backgrounds': defaultX = 0; defaultY = 0; 
+                    img.style.width = '400px'; img.style.height = '400px'; break;
+            }
+            
+            accessory.style.left = defaultX + 'px';
+            accessory.style.top = defaultY + 'px';
+            accessory.style.zIndex = layerOrder;
+            
+            // Make draggable
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+            
+            accessory.addEventListener('mousedown', (e) => {
+                selectLayer(accessory);
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = parseInt(accessory.style.left);
+                initialTop = parseInt(accessory.style.top);
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+                    accessory.style.left = Math.max(0, Math.min(320, initialLeft + deltaX)) + 'px';
+                    accessory.style.top = Math.max(0, Math.min(320, initialTop + deltaY)) + 'px';
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+            
+            accessoriesContainer.appendChild(accessory);
+            selectLayer(accessory);
+        }
+        
+        function selectLayer(layer) {
+            // Remove previous selection
+            document.querySelectorAll('.accessory').forEach(acc => {
+                acc.style.border = 'none';
+            });
+            
+            // Select new layer
+            selectedLayer = layer;
+            layer.style.border = '2px solid #ff0080';
+        }
+        
+        function moveLayerUp() {
+            if (selectedLayer) {
+                const currentZ = parseInt(selectedLayer.style.zIndex) || 0;
+                selectedLayer.style.zIndex = currentZ + 1;
+            }
+        }
+        
+        function moveLayerDown() {
+            if (selectedLayer) {
+                const currentZ = parseInt(selectedLayer.style.zIndex) || 0;
+                selectedLayer.style.zIndex = Math.max(0, currentZ - 1);
+            }
+        }
+        
+        function deleteSelected() {
+            if (selectedLayer) {
+                selectedLayer.remove();
+                selectedLayer = null;
+            }
+        }
+        
+        function clearDuck() {
+            document.getElementById('duckAccessories').innerHTML = '';
+        }
+        
+        function saveDuck() {
+            // Convert duck to canvas and download
+            const duckDisplay = document.getElementById('duckDisplay');
+            
+            // Create a temporary canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 300;
+            canvas.height = 300;
+            
+            // Simple approach - just alert for now since html2canvas isn't available
+            alert('🎉 DUCK SAVED! 🎉\n\n(In a real implementation, this would capture the duck design and save it as an image for your profile picture!)');
+        }
+        
+        // Create sparkles animation
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.innerHTML = '<img src="./images/sparkle.png" style="width:20px;height:20px;object-fit:contain;">';
+            sparkle.style.left = Math.random() * window.innerWidth + 'px';
+            sparkle.style.top = Math.random() * window.innerHeight + 'px';
+            sparkle.style.animationDelay = Math.random() * 2 + 's';
+            
+            document.getElementById('sparkles').appendChild(sparkle);
+            
+            setTimeout(() => {
+                sparkle.remove();
+            }, 2000);
+        }
+        
+        // Create sparkles periodically
+        setInterval(createSparkle, 500);
+        
+        // Add some initial sparkles
+        for (let i = 0; i < 20; i++) {
+            setTimeout(createSparkle, i * 100);
+        }
+    </script>
+</body>
+</html>
