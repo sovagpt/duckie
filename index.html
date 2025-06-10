@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+// Initialize with mouth category
+        window.onload = function() {
+            selectCategory('mouth');
+        };<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -444,12 +447,22 @@
                 img.src = item;
                 img.alt = `${category} ${index + 1}`;
                 
+                // Add error handling for missing images
+                img.onerror = function() {
+                    console.log('Image failed to load:', item);
+                    this.style.background = '#ff0080';
+                    this.style.color = 'white';
+                    this.innerHTML = '?';
+                };
+                
                 slot.appendChild(img);
                 grid.appendChild(slot);
             });
         }
         
         function addItem(imageSrc, category) {
+            console.log('Adding item:', imageSrc, 'Category:', category);
+            
             const accessoriesContainer = document.getElementById('duckAccessories');
             const accessory = document.createElement('div');
             accessory.className = 'accessory';
@@ -462,6 +475,24 @@
             img.style.width = '80px';
             img.style.height = '80px';
             img.style.objectFit = 'contain';
+            
+            // Add error handling
+            img.onerror = function() {
+                console.error('Failed to load image:', imageSrc);
+                // Show a placeholder
+                this.style.background = '#ff0080';
+                this.style.border = '2px solid white';
+                this.style.display = 'flex';
+                this.style.alignItems = 'center';
+                this.style.justifyContent = 'center';
+                this.style.color = 'white';
+                this.innerHTML = '?';
+            };
+            
+            img.onload = function() {
+                console.log('Image loaded successfully:', imageSrc);
+            };
+            
             accessory.appendChild(img);
             
             accessory.id = `accessory-${accessoryCount++}`;
@@ -480,6 +511,7 @@
             accessory.style.left = defaultX + 'px';
             accessory.style.top = defaultY + 'px';
             accessory.style.zIndex = layerOrder;
+            accessory.style.position = 'absolute';
             
             // Make draggable
             let isDragging = false;
@@ -492,6 +524,7 @@
                 startY = e.clientY;
                 initialLeft = parseInt(accessory.style.left);
                 initialTop = parseInt(accessory.style.top);
+                e.preventDefault();
             });
             
             document.addEventListener('mousemove', (e) => {
@@ -509,6 +542,8 @@
             
             accessoriesContainer.appendChild(accessory);
             selectLayer(accessory);
+            
+            console.log('Item added to canvas');
         }
         
         function selectLayer(layer) {
