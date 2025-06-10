@@ -1,7 +1,4 @@
-// Initialize with mouth category
-        window.onload = function() {
-            selectCategory('mouth');
-        };<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -122,6 +119,10 @@
             height: 400px;
             object-fit: contain;
             display: block;
+        }
+        
+        .accessory.background img {
+            object-fit: cover;
         }
         
         .controls {
@@ -428,10 +429,27 @@
             ]
         };
         
-        let currentCategory = 'mouth';
-        let selectedLayer = null;
-        let layerOrder = 0;
-        let accessoryCount = 0;
+        // Categories with proper z-index layering
+        const layerOrder = {
+            backgrounds: 1,
+            colours: 2,
+            mouth: 3,
+            glasses: 4,
+            accessories: 5,
+            handheld: 6,
+            hats: 7
+        };
+        
+        // Track current items per category (only one allowed per category)
+        let currentItems = {
+            mouth: null,
+            glasses: null,
+            handheld: null,
+            hats: null,
+            accessories: null,
+            colours: null,
+            backgrounds: null
+        };
         
         function selectCategory(category) {
             currentCategory = category;
@@ -470,10 +488,21 @@
             console.log('Adding item:', imageSrc, 'Category:', category);
             
             const accessoriesContainer = document.getElementById('duckAccessories');
+            
+            // Remove previous item from this category if it exists
+            if (currentItems[category]) {
+                currentItems[category].remove();
+                currentItems[category] = null;
+            }
+            
             const accessory = document.createElement('div');
             accessory.className = 'accessory';
             accessory.dataset.category = category;
-            accessory.dataset.layer = layerOrder++;
+            
+            // Add background class for special styling
+            if (category === 'backgrounds') {
+                accessory.classList.add('background');
+            }
             
             // Create image element
             const img = document.createElement('img');
@@ -494,10 +523,12 @@
             // Position at 0,0 since images are already positioned in Photoshop
             accessory.style.left = '0px';
             accessory.style.top = '0px';
-            accessory.style.zIndex = layerOrder;
             accessory.style.position = 'absolute';
             
-            // Click to select/deselect (no dragging)
+            // Set proper z-index based on category
+            accessory.style.zIndex = layerOrder[category];
+            
+            // Click to select/deselect
             accessory.addEventListener('click', (e) => {
                 if (selectedLayer === accessory) {
                     // Deselect if already selected
@@ -511,7 +542,10 @@
             
             accessoriesContainer.appendChild(accessory);
             
-            console.log('Item added to canvas at full 1500x1500 size');
+            // Track this item for the category
+            currentItems[category] = accessory;
+            
+            console.log(`${category} item added with z-index:`, layerOrder[category]);
         }
         
         function selectLayer(layer) {
@@ -527,13 +561,20 @@
         
         function deleteSelected() {
             if (selectedLayer) {
+                const category = selectedLayer.dataset.category;
                 selectedLayer.remove();
+                currentItems[category] = null;
                 selectedLayer = null;
             }
         }
         
         function clearDuck() {
             document.getElementById('duckAccessories').innerHTML = '';
+            // Reset all current items
+            Object.keys(currentItems).forEach(key => {
+                currentItems[key] = null;
+            });
+            selectedLayer = null;
         }
         
         function saveDuck() {
