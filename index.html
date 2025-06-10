@@ -48,6 +48,12 @@
             margin-bottom: 20px;
             animation: bounce 2s infinite;
         }
+
+        .item-slot img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
         
         @keyframes bounce {
             0%, 20%, 50%, 80%, 100% { transform: rotate(-2deg) translateY(0); }
@@ -276,10 +282,22 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
-        .item-slot img {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
+        .item-slot.upload-slot {
+            background: linear-gradient(45deg, #00ff80, #0080ff);
+            border: 2px dashed #ffffff;
+            font-size: 2em;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 0 #000000;
+        }
+        
+        .item-slot.upload-slot:hover {
+            background: linear-gradient(45deg, #ff8000, #ff0080);
+            transform: scale(1.1) rotate(-5deg);
+        }
+        
+        .upload-input {
+            display: none;
         }
         
         .social-buttons {
@@ -457,7 +475,7 @@
     <div class="container">
         <h1 class="title">✨ THE DUCKIES MOVEMENT ✨</h1>
         <p class="subtitle rainbow-text">~* customize ur duck & make it EPIC *~</p>
-        <p class="ca-notice">CA: COMING SOON</p>
+        <p class="ca-notice">$CA: COMING SOON</p>
         
         <div class="duck-container">
             <div class="duck-display" id="duckDisplay">
@@ -724,6 +742,102 @@
                 slot.appendChild(img);
                 grid.appendChild(slot);
             });
+            
+            // Add upload option for backgrounds category
+            if (category === 'backgrounds') {
+                const uploadSlot = document.createElement('div');
+                uploadSlot.className = 'item-slot upload-slot';
+                uploadSlot.innerHTML = '+';
+                uploadSlot.title = 'Upload your own background';
+                uploadSlot.onclick = () => triggerBackgroundUpload();
+                grid.appendChild(uploadSlot);
+            }
+        }
+        
+        function triggerBackgroundUpload() {
+            // Create hidden file input
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = handleBackgroundUpload;
+            input.click();
+        }
+        
+        function handleBackgroundUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check file size (limit to 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('🦆 File too large! Please choose an image under 5MB.');
+                return;
+            }
+            
+            // Check if it's an image
+            if (!file.type.startsWith('image/')) {
+                alert('🦆 Please select an image file!');
+                return;
+            }
+            
+            // Create object URL for the uploaded image
+            const imageUrl = URL.createObjectURL(file);
+            
+            // Add the uploaded background to the duck
+            addCustomBackground(imageUrl);
+        }
+        
+        function addCustomBackground(imageSrc) {
+            console.log('Adding custom background:', imageSrc);
+            
+            const accessoriesContainer = document.getElementById('duckAccessories');
+            
+            // Remove previous background if it exists
+            if (currentItems['backgrounds']) {
+                currentItems['backgrounds'].remove();
+                currentItems['backgrounds'] = null;
+            }
+            
+            const accessory = document.createElement('div');
+            accessory.className = 'accessory background';
+            accessory.dataset.category = 'backgrounds';
+            
+            // Create image element
+            const img = document.createElement('img');
+            img.src = imageSrc;
+            
+            img.onload = function() {
+                console.log('Custom background loaded successfully');
+            };
+            
+            img.onerror = function() {
+                console.error('Failed to load custom background');
+                alert('🦆 Failed to load your background image. Please try again!');
+            };
+            
+            accessory.appendChild(img);
+            accessory.id = `accessory-${accessoryCount++}`;
+            
+            // Position at 0,0 since it's a background
+            accessory.style.left = '0px';
+            accessory.style.top = '0px';
+            accessory.style.position = 'absolute';
+            accessory.style.zIndex = layerOrder['backgrounds'];
+            
+            // Click to select/deselect
+            accessory.addEventListener('click', (e) => {
+                if (selectedLayer === accessory) {
+                    accessory.style.border = 'none';
+                    selectedLayer = null;
+                } else {
+                    selectLayer(accessory);
+                }
+                e.stopPropagation();
+            });
+            
+            accessoriesContainer.appendChild(accessory);
+            currentItems['backgrounds'] = accessory;
+            
+            console.log('Custom background added successfully');
         }
         
         function addItem(imageSrc, category) {
