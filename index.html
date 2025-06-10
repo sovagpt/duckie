@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALFRED THE DUCK!!! ★彡</title>
+    <title>THE DUCKIES MOVEMENT!!! ★彡</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
         
@@ -224,32 +224,33 @@
             object-fit: contain;
         }
         
-        .layer-controls {
+        .about-section {
             text-align: center;
-            margin: 20px 0;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 15px;
-            border-radius: 15px;
-            border: 2px dashed #ff0080;
+            margin: 30px 0;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px dashed #00ff80;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 0 20px #ff00ff,
+                inset 0 0 20px rgba(255, 255, 255, 0.5);
         }
         
-        .layer-btn {
-            background: #8000ff;
-            border: 2px solid #ffffff;
-            color: white;
-            font-family: 'Comic Neue', cursive;
-            font-size: 1em;
+        .about-title {
+            font-size: 2em;
             font-weight: bold;
-            padding: 8px 15px;
-            margin: 5px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0 #ffffff;
+            transform: rotate(-1deg);
         }
         
-        .layer-btn:hover {
-            background: #ff0080;
-            transform: scale(1.05);
+        .about-text {
+            font-size: 1.3em;
+            color: #ff0080;
+            text-shadow: 1px 1px 0 #ffffff;
+            line-height: 1.4;
+            font-weight: bold;
+            transform: rotate(0.5deg);
         }
         
         .social-buttons {
@@ -317,7 +318,7 @@
     <div class="sparkles" id="sparkles"></div>
     
     <div class="container">
-        <h1 class="title">✨ ALFRED THE DUCK ✨</h1>
+        <h1 class="title">✨ THE DUCKIES MOVEMENT ✨</h1>
         <p class="subtitle rainbow-text">~* customize ur duck & make it EPIC *~</p>
         
         <div class="duck-container">
@@ -348,16 +349,18 @@
             </div>
         </div>
         
-        <div class="layer-controls">
-            <p style="margin-bottom: 10px; font-weight: bold; color: #ff0080;">LAYER CONTROLS:</p>
-            <button class="layer-btn" onclick="moveLayerUp()">↑ MOVE UP</button>
-            <button class="layer-btn" onclick="moveLayerDown()">↓ MOVE DOWN</button>
-            <button class="layer-btn" onclick="deleteSelected()">🗑️ DELETE</button>
-        </div>
-        
         <div class="social-buttons">
             <a href="#" class="social-btn" title="Pump.fun"><img src="./images/social/pump-fun.png" style="width:40px;height:40px;object-fit:contain;"></a>
             <a href="#" class="social-btn" title="X/Twitter"><img src="./images/social/twitter.png" style="width:40px;height:40px;object-fit:contain;"></a>
+        </div>
+        
+        <div class="about-section">
+            <h3 class="about-title rainbow-text">🦆 ABOUT THE DUCKIES 🦆</h3>
+            <p class="about-text">
+                The Duckies is a movement taking over the memecoin space and creating the biggest community! 
+                Join the quack revolution and customize your very own duckie to be part of the squad! 
+                <span class="rainbow-text">✨ Together we fly higher! ✨</span>
+            </p>
         </div>
     </div>
 
@@ -366,10 +369,7 @@
         const categories = {
             mouth: [
                 './images/mouth/mouth-1.png',
-                './images/mouth/mouth-2.png',
-                './images/mouth/mouth-3.png',
-                './images/mouth/mouth-4.png',
-                './images/mouth/mouth-5.png'
+                './images/mouth/mouth-2.png'
             ],
             glasses: [
                 './images/glasses/glasses-1.png',
@@ -383,28 +383,33 @@
                 './images/handheld/handheld-2.png',
                 './images/handheld/handheld-3.png',
                 './images/handheld/handheld-4.png',
-                './images/handheld/handheld-5.png'
+                './images/handheld/handheld-5.png',
+                './images/handheld/handheld-6.png',
+                './images/handheld/handheld-7.png'
             ],
             hats: [
                 './images/hats/hats-1.png',
                 './images/hats/hats-2.png',
                 './images/hats/hats-3.png',
                 './images/hats/hats-4.png',
-                './images/hats/hats-5.png'
+                './images/hats/hats-5.png',
+                './images/hats/hats-6.png',
+                './images/hats/hats-7.png',
+                './images/hats/hats-8.png',
+                './images/hats/hats-9.png'
             ],
             accessories: [
                 './images/accessories/accessories-1.png',
                 './images/accessories/accessories-2.png',
-                './images/accessories/accessories-3.png',
-                './images/accessories/accessories-4.png',
-                './images/accessories/accessories-5.png'
+                './images/accessories/accessories-3.png'
             ],
             colours: [
                 './images/colours/colours-1.png',
                 './images/colours/colours-2.png',
                 './images/colours/colours-3.png',
                 './images/colours/colours-4.png',
-                './images/colours/colours-5.png'
+                './images/colours/colours-5.png',
+                './images/colours/colours-6.png'
             ],
             backgrounds: [
                 './images/backgrounds/backgrounds-1.png',
@@ -515,20 +520,6 @@
             // Select new layer
             selectedLayer = layer;
             layer.style.border = '2px solid #ff0080';
-        }
-        
-        function moveLayerUp() {
-            if (selectedLayer) {
-                const currentZ = parseInt(selectedLayer.style.zIndex) || 0;
-                selectedLayer.style.zIndex = currentZ + 1;
-            }
-        }
-        
-        function moveLayerDown() {
-            if (selectedLayer) {
-                const currentZ = parseInt(selectedLayer.style.zIndex) || 0;
-                selectedLayer.style.zIndex = Math.max(0, currentZ - 1);
-            }
         }
         
         function deleteSelected() {
