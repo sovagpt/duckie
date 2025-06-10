@@ -77,8 +77,8 @@
         }
         
         .duck-display {
-            width: 400px;
-            height: 400px;
+            width: 1500px;
+            height: 1500px;
             margin: 0 auto;
             position: relative;
             background: transparent;
@@ -88,32 +88,42 @@
             justify-content: center;
             overflow: hidden;
             border-radius: 20px;
+            transform: scale(0.27);
+            transform-origin: center;
         }
         
         .duck-base {
-            width: 400px;
-            height: 400px;
+            width: 1500px;
+            height: 1500px;
             background: transparent;
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
             background-image: url('./images/colours/colours-1.png');
-            background-size: contain;
+            background-size: 1500px 1500px;
             background-repeat: no-repeat;
-            background-position: center;
+            background-position: top left;
         }
         
         .duck-accessories {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 1500px;
+            height: 1500px;
         }
         
         .accessory {
             position: absolute;
-            font-size: 2em;
-            cursor: move;
+            cursor: pointer;
             user-select: none;
+        }
+        
+        .accessory img {
+            width: 1500px;
+            height: 1500px;
+            object-fit: contain;
+            display: block;
         }
         
         .controls {
@@ -470,21 +480,10 @@
             // Create image element
             const img = document.createElement('img');
             img.src = imageSrc;
-            img.style.width = '80px';
-            img.style.height = '80px';
-            img.style.objectFit = 'contain';
             
             // Add error handling
             img.onerror = function() {
                 console.error('Failed to load image:', imageSrc);
-                // Show a placeholder
-                this.style.background = '#ff0080';
-                this.style.border = '2px solid white';
-                this.style.display = 'flex';
-                this.style.alignItems = 'center';
-                this.style.justifyContent = 'center';
-                this.style.color = 'white';
-                this.innerHTML = '?';
             };
             
             img.onload = function() {
@@ -492,56 +491,29 @@
             };
             
             accessory.appendChild(img);
-            
             accessory.id = `accessory-${accessoryCount++}`;
             
-            // Position based on category (you can adjust these)
-            let defaultX = 160, defaultY = 160;
-            switch(category) {
-                case 'mouth': defaultY = 220; break;
-                case 'glasses': defaultY = 180; break;
-                case 'hats': defaultY = 100; break;
-                case 'handheld': defaultX = 280; defaultY = 200; break;
-                case 'backgrounds': defaultX = 0; defaultY = 0; 
-                    img.style.width = '400px'; img.style.height = '400px'; break;
-            }
-            
-            accessory.style.left = defaultX + 'px';
-            accessory.style.top = defaultY + 'px';
+            // Position at 0,0 since images are already positioned in Photoshop
+            accessory.style.left = '0px';
+            accessory.style.top = '0px';
             accessory.style.zIndex = layerOrder;
             accessory.style.position = 'absolute';
             
-            // Make draggable
-            let isDragging = false;
-            let startX, startY, initialLeft, initialTop;
-            
-            accessory.addEventListener('mousedown', (e) => {
-                selectLayer(accessory);
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                initialLeft = parseInt(accessory.style.left);
-                initialTop = parseInt(accessory.style.top);
-                e.preventDefault();
-            });
-            
-            document.addEventListener('mousemove', (e) => {
-                if (isDragging) {
-                    const deltaX = e.clientX - startX;
-                    const deltaY = e.clientY - startY;
-                    accessory.style.left = Math.max(0, Math.min(320, initialLeft + deltaX)) + 'px';
-                    accessory.style.top = Math.max(0, Math.min(320, initialTop + deltaY)) + 'px';
+            // Click to select/deselect (no dragging)
+            accessory.addEventListener('click', (e) => {
+                if (selectedLayer === accessory) {
+                    // Deselect if already selected
+                    accessory.style.border = 'none';
+                    selectedLayer = null;
+                } else {
+                    selectLayer(accessory);
                 }
-            });
-            
-            document.addEventListener('mouseup', () => {
-                isDragging = false;
+                e.stopPropagation();
             });
             
             accessoriesContainer.appendChild(accessory);
-            selectLayer(accessory);
             
-            console.log('Item added to canvas');
+            console.log('Item added to canvas at full 1500x1500 size');
         }
         
         function selectLayer(layer) {
